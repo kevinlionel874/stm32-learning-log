@@ -2,6 +2,11 @@
 
 **Date:** 2026-10-22 · **Code:** [`blink/`](../blink/) · **Video:** [SOS on the Blue Pill](../media/lesson-02-sos.mp4)
 
+
+
+https://github.com/user-attachments/assets/38af4e9b-1e24-4ee7-8c33-b9ea76ac413f
+
+
 ## Goal
 
 Understand what the GPIO pin is actually doing electrically, run the chip at its full 72 MHz from the external crystal, and write my own small LED functions.
