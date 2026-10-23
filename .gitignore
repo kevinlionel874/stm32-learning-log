@@ -1,0 +1,17 @@
+# Build output
+Debug/
+Release/
+*.o
+*.d
+*.su
+*.elf
+*.map
+*.list
+*.bin
+*.hex
+
+# IDE and OS files
+.metadata/
+*.bak
+Thumbs.db
+.DS_Store
