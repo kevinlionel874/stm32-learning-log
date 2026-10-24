@@ -30,8 +30,8 @@ Start from blinking one LED and build up to a project that connects embedded sys
 | 1 | 2026-10-20 | Toolchain setup, SWD wiring, first blinking LED | ✅ Done | [log](logs/lesson-01-blink.md) | [`blink/`](blink/) |
 | 2 | 2026-10-22 | GPIO internals (active-low LED, push-pull vs open-drain), 72 MHz clock, SOS in Morse code | ✅ Done | [log](logs/lesson-02-gpio-clock.md) · [video](media/lesson-02-sos.mp4) | [`blink/`](blink/) |
 | 3 | 2026-10-23 | Non-blocking timing with `HAL_GetTick`, two tasks at once (~910 000 loop passes/s), SOS as a state machine | ✅ Done | [log](logs/lesson-03-gettick.md) · [video](media/lesson-03-sos-nonblocking.mp4) · [photo](media/lesson-03-board.jpg) | [`blink/`](blink/) |
-| 4 | | Timer interrupts | 🔄 Next | | |
-| 5 | | Debugging with breakpoints and watch variables | Planned | | |
+| 4 | 2026-10-24 | TIM2 update interrupt every 0.5 s; LED keeps perfect time even when the main loop is blocked | ✅ Done | [log](logs/lesson-04-timer-interrupt.md) · [screenshot](media/lesson-04-debugger.webp) | [`blink/`](blink/) |
+| 5 | | Debugging with breakpoints and watch variables | 🔄 Next | | |
 | 6 | | Breadboard: external LEDs and buttons | Planned | | |
 | 7–9 | | External interrupts, UART | Planned | | |
 | 10–13 | | PWM: breathing LED, buzzer music, servo, rotary encoder | Planned | | |

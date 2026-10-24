@@ -40,12 +40,14 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
 uint32_t led_last = 0;   // 上一次翻转 LED 的时间（毫秒）
 uint32_t sec_last = 0;     // 上一次「秒数 +1」的时间
 uint32_t seconds = 0;      // 任务 2 自己数的秒数
 uint32_t loop_count = 0;   // while 循环一共跑了多少圈
+volatile uint32_t tim2_count = 0;   // TIM2 中断发生了多少次（在中断里会被改，所以加 volatile）
 // SOS 节奏表：亮、灭、亮、灭……依次排下去（单位：毫秒）
 const uint32_t sos[] = {
   150,150, 150,150, 150,450,    // S：最后一个「灭」多等 300，表示字母结束
@@ -62,6 +64,7 @@ uint32_t sos_last = 0;    // 这一步是什么时候开始的
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -121,9 +124,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   LED_On();                  // 第 0 步是「亮」，所以先点亮
   sos_last = HAL_GetTick();  // 第 0 步从现在开始计时
+  HAL_TIM_Base_Start_IT(&htim2);   // 启动 TIM2，并打开它的中断（IT = interrupt）
 
   /* USER CODE END 2 */
 
@@ -147,17 +152,17 @@ int main(void)
 //	    HAL_Delay(900);   // 一整组 SOS 结束，停久一点再重来
 	    uint32_t now = HAL_GetTick();   // 现在是开机后第几毫秒
 
-	    // 任务 1（新）：不卡住的 SOS，按节奏表一步一步走
-	    if (now - sos_last >= sos[sos_index])
-	    {
-	      sos_last = now;
-	      sos_index = (sos_index + 1) % SOS_STEPS;   // 走到下一步，18 步走完就回到第 0 步
-
-	      if (sos_index % 2 == 0)
-	        LED_On();    // 偶数步：亮
-	      else
-	        LED_Off();   // 奇数步：灭
-	    }
+//	    // 任务 1（新）：不卡住的 SOS，按节奏表一步一步走
+//	    if (now - sos_last >= sos[sos_index])
+//	    {
+//	      sos_last = now;
+//	      sos_index = (sos_index + 1) % SOS_STEPS;   // 走到下一步，18 步走完就回到第 0 步
+//
+//	      if (sos_index % 2 == 0)
+//	        LED_On();    // 偶数步：亮
+//	      else
+//	        LED_Off();   // 奇数步：灭
+//	    }
 	    // 任务 2：每 1000 毫秒，秒数加 1
 	    if (now - sec_last >= 1000)
 	    {
@@ -166,9 +171,11 @@ int main(void)
 	    }
 
 	    loop_count++;   // 每跑一圈就加 1
+	    HAL_Delay(3000);   // 实验：故意让主循shide环每圈卡 3 秒
   }
   /* USER CODE END 3 */
 }
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -209,6 +216,51 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 7200-1;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 5000-1;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -241,6 +293,15 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+// 定时器中断回调：TIM2 每数满一圈（0.5 秒），HAL 就调用一次这个函数
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM2)   // 确认是 TIM2 触发的（以后可能有好几个定时器）
+  {
+    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+    tim2_count++;   // 每来一次中断就加 1
+  }
+}
 
 /* USER CODE END 4 */
 
