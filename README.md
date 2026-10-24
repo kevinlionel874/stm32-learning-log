@@ -20,7 +20,7 @@ Start from blinking one LED and build up to a project that connects embedded sys
 ## Toolchain
 
 - **STM32CubeMX**: pin and clock configuration, code generation
-- **STM32CubeIDE 2.2.0**: editing, building, flashing, debugging
+- **STM32CubeIDE 2.2.0**: editing, building (internal builder, see [lesson 3](logs/lesson-03-gettick.md)), flashing, debugging
 - **STM32 HAL library** (STM32Cube FW_F1 V1.8.7)
 
 ## Progress
@@ -29,8 +29,8 @@ Start from blinking one LED and build up to a project that connects embedded sys
 |---|---|---|---|---|---|
 | 1 | 2026-10-20 | Toolchain setup, SWD wiring, first blinking LED | ✅ Done | [log](logs/lesson-01-blink.md) | [`blink/`](blink/) |
 | 2 | 2026-10-22 | GPIO internals (active-low LED, push-pull vs open-drain), 72 MHz clock, SOS in Morse code | ✅ Done | [log](logs/lesson-02-gpio-clock.md) · [video](media/lesson-02-sos.mp4) | [`blink/`](blink/) |
-| 3 | | Non-blocking timing with `HAL_GetTick` | 🔄 Next | | |
-| 4 | | Timer interrupts | Planned | | |
+| 3 | 2026-10-23 | Non-blocking timing with `HAL_GetTick`, two tasks at once (~910 000 loop passes/s), SOS as a state machine | ✅ Done | [log](logs/lesson-03-gettick.md) · [screenshot](media/lesson-03-expressions.png) | [`blink/`](blink/) |
+| 4 | | Timer interrupts | 🔄 Next | | |
 | 5 | | Debugging with breakpoints and watch variables | Planned | | |
 | 6 | | Breadboard: external LEDs and buttons | Planned | | |
 | 7–9 | | External interrupts, UART | Planned | | |

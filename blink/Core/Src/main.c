@@ -42,6 +42,20 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uint32_t led_last = 0;   // 上一次翻转 LED 的时间（毫秒）
+uint32_t sec_last = 0;     // 上一次「秒数 +1」的时间
+uint32_t seconds = 0;      // 任务 2 自己数的秒数
+uint32_t loop_count = 0;   // while 循环一共跑了多少圈
+// SOS 节奏表：亮、灭、亮、灭……依次排下去（单位：毫秒）
+const uint32_t sos[] = {
+  150,150, 150,150, 150,450,    // S：最后一个「灭」多等 300，表示字母结束
+  450,150, 450,150, 450,450,    // O
+  150,150, 150,150, 150,1050    // S：最后一个「灭」多等 900，表示一整组结束
+};
+#define SOS_STEPS (sizeof(sos) / sizeof(sos[0]))   // 表里一共有几步（18）
+
+uint32_t sos_index = 0;   // 现在走到第几步（偶数步亮，奇数步灭）
+uint32_t sos_last = 0;    // 这一步是什么时候开始的
 
 /* USER CODE END PV */
 
@@ -108,6 +122,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
+  LED_On();                  // 第 0 步是「亮」，所以先点亮
+  sos_last = HAL_GetTick();  // 第 0 步从现在开始计时
 
   /* USER CODE END 2 */
 
@@ -118,21 +134,41 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	    // S：三短（点）
-	    for (int i = 0; i < 3; i++) LED_Blink(150, 150);
-	    HAL_Delay(300);   // 字母之间多停一会儿
+//	    // S：三短（点）
+//	    for (int i = 0; i < 3; i++) LED_Blink(150, 150);
+//	    HAL_Delay(300);   // 字母之间多停一会儿
+//
+//	    // O：三长（划）
+//	    for (int i = 0; i < 3; i++) LED_Blink(450, 150);
+//	    HAL_Delay(300);
+//
+//	    // S：三短
+//	    for (int i = 0; i < 3; i++) LED_Blink(150, 150);
+//	    HAL_Delay(900);   // 一整组 SOS 结束，停久一点再重来
+	    uint32_t now = HAL_GetTick();   // 现在是开机后第几毫秒
 
-	    // O：三长（划）
-	    for (int i = 0; i < 3; i++) LED_Blink(450, 150);
-	    HAL_Delay(300);
+	    // 任务 1（新）：不卡住的 SOS，按节奏表一步一步走
+	    if (now - sos_last >= sos[sos_index])
+	    {
+	      sos_last = now;
+	      sos_index = (sos_index + 1) % SOS_STEPS;   // 走到下一步，18 步走完就回到第 0 步
 
-	    // S：三短
-	    for (int i = 0; i < 3; i++) LED_Blink(150, 150);
-	    HAL_Delay(900);   // 一整组 SOS 结束，停久一点再重来
+	      if (sos_index % 2 == 0)
+	        LED_On();    // 偶数步：亮
+	      else
+	        LED_Off();   // 奇数步：灭
+	    }
+	    // 任务 2：每 1000 毫秒，秒数加 1
+	    if (now - sec_last >= 1000)
+	    {
+	      sec_last = now;
+	      seconds++;
+	    }
+
+	    loop_count++;   // 每跑一圈就加 1
   }
   /* USER CODE END 3 */
 }
-
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -194,7 +230,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
