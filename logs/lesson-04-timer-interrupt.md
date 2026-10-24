@@ -1,6 +1,6 @@
 # Lesson 04: Timer interrupts with TIM2
 
-**Date:** 2026-10-24 · **Code:** [`blink/`](../blink/) · **Screenshot:** [counters read in the debugger](../media/lesson-04-debugger.webp)
+**Date:** 2026-10-24 · **Code:** [`blink/`](../blink/) · **Videos:** [polling](../media/lesson-04-polling.mp4) vs. [interrupt](../media/lesson-04-interrupt.mp4) · **Screenshot:** [counters read in the debugger](../media/lesson-04-debugger.webp)
 
 ## Goal
 
@@ -40,6 +40,15 @@ Let a hardware timer keep time and interrupt the CPU when time is up, so the tim
    ```
    I commented out the SOS task from lesson 3 so that only the interrupt controls the LED. The main loop no longer contains any LED code.
 3. **Experiment: blocked the main loop on purpose.** I added `HAL_Delay(3000)` to the main loop, so each pass takes 3 seconds. The LED still toggled exactly every 0.5 s, because the timing is done by the timer hardware, not by the loop.
+
+   To show the difference, I filmed two versions with the same blocked loop. For the polling version I temporarily commented out `HAL_TIM_Base_Start_IT()` and toggled the LED from the main loop with the lesson 3 `HAL_GetTick()` check. Then I measured the LED frame by frame (30 frames per second):
+
+   | Version | Who toggles the LED | LED on / off (measured) |
+   |---|---|---|
+   | [Polling](../media/lesson-04-polling.mp4) | The main loop, when it gets around to checking the clock | **3000 ms / 3000 ms** |
+   | [Interrupt](../media/lesson-04-interrupt.mp4) | The TIM2 callback | **533 ms / 467 ms**: every on/off cycle took exactly 1.000 s, 16 cycles in a row |
+
+   The polling version is six times too slow, because the loop only gets back to the check once every 3 seconds. The interrupt version doesn't care. On + off add up to exactly 1 s, and I think the uneven 533/467 split comes from the phone camera's exposure making the LED look on for slightly longer. The code is back to the interrupt version, and the polling block is left in `main.c` as a comment.
 4. **Measured it with the debugger.** I counted interrupts in a `volatile` variable (`volatile` because it's changed inside an interrupt, so the compiler must always read it from memory). I ran the program for about half a minute, paused it, and read four variables:
 
    | Variable | Value | Meaning |

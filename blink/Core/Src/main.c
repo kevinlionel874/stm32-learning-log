@@ -151,6 +151,12 @@ int main(void)
 //	    for (int i = 0; i < 3; i++) LED_Blink(150, 150);
 //	    HAL_Delay(900);   // 一整组 SOS 结束，停久一点再重来
 	    uint32_t now = HAL_GetTick();   // 现在是开机后第几毫秒
+//	    // 轮询版（录视频 A 用）：主循环自己看表翻转 LED
+//	    if (now - led_last >= 500)
+//	    {
+//	      led_last = now;
+//	      HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+//	    }
 
 //	    // 任务 1（新）：不卡住的 SOS，按节奏表一步一步走
 //	    if (now - sos_last >= sos[sos_index])
