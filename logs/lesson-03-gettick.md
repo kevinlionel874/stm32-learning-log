@@ -1,6 +1,8 @@
 # Lesson 03: Non-blocking timing with HAL_GetTick
 
-**Date:** 2026-10-23 · **Code:** [`blink/`](../blink/) · **Screenshot:** [variables read in the debugger](../media/lesson-03-expressions.png)
+**Date:** 2026-10-23 · **Code:** [`blink/`](../blink/) · **Video:** [non-blocking SOS](../media/lesson-03-sos-nonblocking.mp4) · **Screenshot:** [variables read in the debugger](../media/lesson-03-expressions.png)
+
+![Blue Pill running the non-blocking SOS, connected to the ST-Link over SWD](../media/lesson-03-board.jpg)
 
 ## Goal
 
@@ -44,6 +46,16 @@ Stop the program from sitting inside `HAL_Delay()`, so it can do several things 
    }
    ```
    The LED shows the same SOS as in lesson 2, but now the loop never stops: SOS and the seconds counter run side by side. I left the old blocking version in `main.c` as a comment for comparison.
+5. **Checked the timing in a video**, the same way as in lesson 2. I measured the LED frame by frame at 30 frames per second (33 ms per frame):
+
+   | Element | Expected | Measured |
+   |---|---|---|
+   | Dot (on) | 150 ms | 167–200 ms |
+   | Gap inside a letter | 150 ms | 100–133 ms |
+   | Dash (on) | 450 ms | 467–500 ms |
+   | Gap between letters | 450 ms | 400–433 ms |
+
+   Everything is within one or two frames of the table, so the state machine reproduces the lesson 2 timing without ever blocking.
 
 ## Problems I ran into and how I fixed them
 
