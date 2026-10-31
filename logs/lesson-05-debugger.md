@@ -1,6 +1,6 @@
 # Lesson 05: Breakpoints, stepping and reading hardware registers
 
-**Date:** 2026-10-31 · **Code:** [`blink/`](../blink/) (no code changes this lesson) · **Screenshots:** [call stack](../media/lesson-05-call-stack.png), [GPIOC ODR](../media/lesson-05-sfr-gpioc-odr.png), [TIM2 registers](../media/lesson-05-sfr-tim2.png)
+**Date:** 2026-10-31 · **Code:** [`blink/`](../blink/) (no code changes this lesson) · **Video:** [stepping through main() with the board in view](../media/lesson-05-stepping.mp4) · **Screenshots:** [call stack](../media/lesson-05-call-stack.png), [GPIOC ODR](../media/lesson-05-sfr-gpioc-odr.png), [TIM2 registers](../media/lesson-05-sfr-tim2.png)
 
 ## Goal
 
@@ -32,6 +32,8 @@ Use the debugger as a measuring tool, not just a pause button: stop at a chosen 
    | Stepping over `HAL_Delay(3000)` in the loop | Blinking | Stepping over that line really runs the CPU for 3 s, and TIM2 interrupts still happen during it |
 
    Pressing Step Into on `HAL_Init()` took me into the HAL source (`stm32f1xx_hal.c`), so I could follow exactly what the library does.
+
+   I [filmed the screen and the board together](../media/lesson-05-stepping.mp4) while stepping. Measured frame by frame, the LED stays off for the first 11 s while I step through the initialization, and turns on at the step that executes `LED_On()`. In the main loop, every Step Over of `HAL_Delay(3000)` produces a burst of about 3 s with the LED toggling every 500 ms (533 ms on, 467 ms off), and then the LED freezes again while the CPU waits for my next step.
 3. **Turned the LED on by writing a register, with the CPU halted.** In the SFRs view, GPIOC's output data register `ODR` is at address `0x4001100C` and read `0x2000`, so only bit 13 was set (PC13 high, LED off). I changed it to `0x0` and the LED turned on immediately, without a single line of code running. `HAL_GPIO_WritePin` ultimately does exactly this: peripherals are controlled by writing numbers to fixed addresses (memory-mapped I/O). The value field wanted hexadecimal input (`0x0`), plain `0` was rejected.
 4. **Checked that CubeMX settings really end up in hardware registers.** TIM2's `PSC` was `0x1C1F` (7199) and `ARR` was `0x1387` (4999), exactly the `7200-1` and `5000-1` I entered in lesson 4. `RCC_APB1ENR.TIM2EN = 1` shows the timer's clock is switched on, and `TIM2_CR1 = 0x1` shows the counter is enabled (CEN).
 5. **Answered the lesson 4 question.** With the CPU halted the whole time, I re-read TIM2's counter (`CNT`) several times:
