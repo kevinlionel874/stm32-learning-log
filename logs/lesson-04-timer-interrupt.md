@@ -60,7 +60,7 @@ Let a hardware timer keep time and interrupt the CPU when time is up, so the tim
 
    The polling task can only be as accurate as the loop is fast. Each loop pass can add at most one second, so it fell behind by two thirds. The two interrupt-driven counters (`uwTick` and `tim2_count`) agree with each other.
 
-   `tim2_count` is one higher than 66.5. My guess is that it comes from pausing in the debugger. When the core is halted, SysTick (which drives `uwTick`) stops too, but on the STM32F1 a timer like TIM2 keeps counting unless its freeze bit in the DBGMCU register is set. I haven't confirmed this yet.
+   `tim2_count` is one higher than 66.5. My guess is that it comes from pausing in the debugger. When the core is halted, SysTick (which drives `uwTick`) stops too, but on the STM32F1 a timer like TIM2 keeps counting unless its freeze bit in the DBGMCU register is set. I haven't confirmed this yet. *(Confirmed in [lesson 5](lesson-05-debugger.md): TIM2's counter kept changing while the CPU was halted, and stopped once `DBG_TIM2_STOP` was set.)*
 5. **Realized I had been using interrupts since lesson 1.** `HAL_Delay()` and `HAL_GetTick()` work because the SysTick timer interrupts the CPU every millisecond and increments `uwTick`. `HAL_Init()` sets this up.
 
 ## Problems I ran into and how I fixed them
