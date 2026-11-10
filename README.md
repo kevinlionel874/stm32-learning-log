@@ -32,7 +32,7 @@ Start from blinking one LED and build up to a project that connects embedded sys
 | 3 | 2026-10-23 | Non-blocking timing with `HAL_GetTick`, two tasks at once (~910 000 loop passes/s), SOS as a state machine | ✅ Done | [log](logs/lesson-03-gettick.md) · [video](media/lesson-03-sos-nonblocking.mp4) · [photo](media/lesson-03-board.jpg) | [`blink/`](blink/) |
 | 4 | 2026-10-24 | TIM2 update interrupt every 0.5 s; LED keeps perfect time even when the main loop is blocked | ✅ Done | [log](logs/lesson-04-timer-interrupt.md) · videos: [polling](media/lesson-04-polling.mp4) vs. [interrupt](media/lesson-04-interrupt.mp4) | [`blink/`](blink/) |
 | 5 | 2026-10-31 | Debugger: breakpoints, call stack inside an interrupt, stepping, writing GPIO/TIM2 registers by hand; found why TIM2 got one count ahead | ✅ Done | [log](logs/lesson-05-debugger.md) · [video](media/lesson-05-stepping.mp4) · [call stack](media/lesson-05-call-stack.png) | [`blink/`](blink/) |
-| 6 | | Breadboard: external LEDs and buttons | 🔄 Next | | |
+| 6 | 2026-11 | Soldered the header pins at the ECE OpenLab; breadboard: external LEDs and buttons | 🔄 In progress | [log](logs/lesson-06-breadboard.md) · [soldering video](media/lesson-06-soldering.mp4) | |
 | 7–9 | | External interrupts, UART | Planned | | |
 | 10–13 | | PWM: breathing LED, buzzer music, servo, rotary encoder | Planned | | |
 | 14 | | ADC | Planned | | |
